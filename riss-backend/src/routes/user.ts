@@ -104,5 +104,44 @@ router.get('/:identifier', async (req, res) => {
   }
 });
 
+/**
+ * PATCH /api/user/:identifier
+ * Update username (and later other profile fields)
+ */
+router.patch('/:identifier', async (req, res) => {
+  try {
+    const { identifier } = req.params;
+    const { username } = req.body as { username?: string };
+
+    if (!username || typeof username !== 'string') {
+      return res.status(400).json({ error: 'Username is required' });
+    }
+
+    const user = await User.findOne({
+      $or: [
+        { walletAddress: identifier.toLowerCase() },
+        { did: identifier }
+      ]
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    user.username = username;
+    await user.save();
+
+    res.json({
+      did: user.did,
+      walletAddress: user.walletAddress,
+      username: user.username,
+      message: 'Username updated',
+    });
+  } catch (error) {
+    logger.error('Error updating user:', error);
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
 export default router;
 

@@ -13,6 +13,7 @@ import verificationRoutes from './routes/verification.js';
 import krnlRoutes from './routes/krnl.js';
 import userRoutes from './routes/user.js';
 import organizationRoutes from './routes/organization.js';
+import statsRoutes from './routes/stats.js';
 
 dotenv.config();
 
@@ -48,6 +49,7 @@ app.use('/api/verification', verificationRoutes);
 app.use('/api/krnl', krnlRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/organization', organizationRoutes);
+app.use('/api/stats', statsRoutes);
 
 // Error handling middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {

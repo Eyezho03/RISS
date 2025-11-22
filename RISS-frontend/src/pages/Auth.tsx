@@ -1,183 +1,300 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { StaggerReveal } from '@/components/ui/StaggerReveal'
+import { Wallet, Globe, Fingerprint, ArrowRight } from 'lucide-react'
+import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { useAppContext } from '@/context/AppContext'
-import { Wallet, Key, Fingerprint, Plug, ExternalLink } from 'lucide-react'
+import { Modal } from '@/components/ui/Modal'
+import { useAuth } from '@/auth/AuthContext'
 
-export default function Auth(): JSX.Element {
+export default function Auth() {
+  const [showWalletModal, setShowWalletModal] = useState(false)
+  const [showInternetIdentityModal, setShowInternetIdentityModal] = useState(false)
+  const [showUsernameModal, setShowUsernameModal] = useState(false)
+  const [usernameInput, setUsernameInput] = useState('')
+  const [savingUsername, setSavingUsername] = useState(false)
+  const [usernameError, setUsernameError] = useState<string | undefined>()
+  const [roleHint, setRoleHint] = useState<string | undefined>()
+  const [pendingRedirectRole, setPendingRedirectRole] = useState<'developer' | 'organization' | undefined>()
   const navigate = useNavigate()
-  const { wallet, did } = useAppContext()
-  const [didToken, setDidToken] = useState('')
-  const [isBiometric, setIsBiometric] = useState(false)
+  const { connectEvm, connectSolana, walletAddress, userType, setUserType } = useAuth()
 
-  const handleWalletConnect = async (): Promise<void> => {
-    try {
-      await wallet.connect()
-      if (wallet.address) {
-        // Create DID with wallet address
-        await did.createDID(wallet.address)
-        navigate('/dashboard')
+  // After wallet + role are set, ensure user exists and, if needed, prompt for username
+  useEffect(() => {
+    if (!walletAddress || !userType) return
+
+    const ensureProfile = async (): Promise<void> => {
+      try {
+        setUsernameError(undefined)
+        const identifier = encodeURIComponent(walletAddress)
+
+        // Try to load existing user by wallet
+        let res = await fetch(`/api/user/${identifier}`)
+        let userJson: any | null = null
+
+        if (res.status === 404) {
+          // Register minimal user on first connect
+          const did = `did:riss:${walletAddress.toLowerCase()}`
+          const registerRes = await fetch('/api/user/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ did, walletAddress }),
+          })
+          if (!registerRes.ok) {
+            throw new Error('Failed to register user')
+          }
+          userJson = await registerRes.json()
+        } else if (res.ok) {
+          userJson = await res.json()
+        }
+
+        if (userJson?.username) {
+          navigate(userType === 'developer' ? '/dashboard' : '/explore')
+        } else {
+          setPendingRedirectRole(userType)
+          setShowUsernameModal(true)
+        }
+      } catch (error) {
+        console.error('Failed to ensure user profile', error)
+        // Fallback: still navigate so user is not stuck
+        navigate(userType === 'developer' ? '/dashboard' : '/explore')
       }
-    } catch (error) {
-      console.error('Wallet connection failed:', error)
     }
-  }
 
-  const handleDIDToken = (): void => {
-    // Mock DID token validation
-    if (didToken.trim()) {
-      navigate('/dashboard')
-    }
-  }
+    void ensureProfile()
+  }, [walletAddress, userType, navigate])
 
-  const handleBiometric = (): void => {
-    // Mock biometric authentication
-    setIsBiometric(true)
-    setTimeout(() => {
-      navigate('/dashboard')
-    }, 1000)
-  }
+  const authMethods = [
+    {
+      id: 'wallet',
+      title: 'Connect Wallet',
+      description: 'Connect with MetaMask, WalletConnect, or other Web3 wallets',
+      icon: Wallet,
+      color: 'text-primary-purple',
+      bgColor: 'bg-primary-purple/20',
+      onClick: () => setShowWalletModal(true),
+    },
+    {
+      id: 'internet-identity',
+      title: 'Internet Identity',
+      description: 'Sign in with Internet Computer Identity',
+      icon: Globe,
+      color: 'text-primary-cyan',
+      bgColor: 'bg-primary-cyan/20',
+      onClick: () => setShowInternetIdentityModal(true),
+    },
+    {
+      id: 'biometric',
+      title: 'Biometric Auth',
+      description: 'Use fingerprint or face recognition',
+      icon: Fingerprint,
+      color: 'text-success',
+      bgColor: 'bg-success/20',
+      onClick: () => console.log('Biometric auth'),
+    },
+  ]
+
+  const wallets = [
+    { name: 'MetaMask (EVM)', icon: '🦊', type: 'evm' as const },
+    { name: 'Phantom (Solana)', icon: '👻', type: 'solana' as const },
+  ]
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-16">
-      <div className="max-w-md w-full space-y-8">
-        <StaggerReveal>
-          <div className="space-y-8">
-            <div className="text-center">
-              <h1 className="font-display text-4xl font-bold text-accent mb-2">
-                Authenticate
-              </h1>
-              <p className="font-body text-muted">
-                Choose your authentication method
-              </p>
-            </div>
-
-            {/* KRNL Connect */}
-            <div className="bg-panel border-2 border-accent p-6 space-y-4">
-              <div className="flex items-center gap-3 mb-4">
-                <Plug size={24} className="text-accent" />
-                <h2 className="font-display text-xl font-bold text-accent">
-                  KRNL Connect
-                </h2>
-              </div>
-              <p className="font-body text-sm text-muted">
-                Connect your wallet through KRNL Protocol for seamless integration
-              </p>
-              {wallet.isConnected ? (
-                <div className="space-y-2">
-                  <p className="font-body text-sm text-muted">
-                    Connected: {wallet.ensName || wallet.address}
-                  </p>
-                  <Button onClick={() => navigate('/dashboard')} className="w-full">
-                    Continue to Dashboard
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={wallet.disconnect}
-                    className="w-full"
-                  >
-                    Disconnect
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <Button
-                    onClick={handleWalletConnect}
-                    disabled={wallet.isConnecting}
-                    className="w-full"
-                  >
-                    {wallet.isConnecting ? 'Connecting...' : 'Connect MetaMask'}
-                  </Button>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button variant="secondary" className="w-full" disabled>
-                      Phantom
-                    </Button>
-                    <Button variant="secondary" className="w-full" disabled>
-                      Freighter
-                    </Button>
-                  </div>
-                  <p className="font-body text-xs text-muted text-center">
-                    More wallets coming soon
-                  </p>
-                </div>
-              )}
-              {wallet.error && (
-                <p className="text-sm text-red-500" role="alert">
-                  {wallet.error}
-                </p>
-              )}
-            </div>
-
-            {/* Connect Wallet (Alternative) */}
-            <div className="bg-panel border-2 border-muted/20 p-6 space-y-4">
-              <div className="flex items-center gap-3 mb-4">
-                <Wallet size={24} className="text-accent" />
-                <h2 className="font-display text-xl font-bold text-accent">
-                  Direct Wallet Connect
-                </h2>
-              </div>
-              {wallet.isConnected ? (
-                <div className="space-y-2">
-                  <p className="font-body text-sm text-muted">
-                    Connected: {wallet.ensName || wallet.address}
-                  </p>
-                  <Button onClick={() => navigate('/dashboard')} className="w-full">
-                    Continue to Dashboard
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  onClick={handleWalletConnect}
-                  disabled={wallet.isConnecting}
-                  className="w-full"
-                >
-                  {wallet.isConnecting ? 'Connecting...' : 'Connect MetaMask'}
-                </Button>
-              )}
-            </div>
-
-            {/* DID Token */}
-            <div className="bg-panel border-2 border-muted/20 p-6 space-y-4">
-              <div className="flex items-center gap-3 mb-4">
-                <Key size={24} className="text-accent" />
-                <h2 className="font-display text-xl font-bold text-accent">
-                  DID Token
-                </h2>
-              </div>
-              <Input
-                label="Enter DID Token"
-                value={didToken}
-                onChange={(e) => setDidToken(e.target.value)}
-                placeholder="did:riss:..."
-                className="mb-4"
-              />
-              <Button onClick={handleDIDToken} className="w-full">
-                Authenticate
-              </Button>
-            </div>
-
-            {/* Biometric (Mock) */}
-            <div className="bg-panel border-2 border-muted/20 p-6 space-y-4">
-              <div className="flex items-center gap-3 mb-4">
-                <Fingerprint size={24} className="text-accent" />
-                <h2 className="font-display text-xl font-bold text-accent">
-                  Biometric
-                </h2>
-              </div>
-              <Button
-                onClick={handleBiometric}
-                disabled={isBiometric}
-                className="w-full"
-              >
-                {isBiometric ? 'Authenticating...' : 'Authenticate with Biometric'}
-              </Button>
-            </div>
-          </div>
-        </StaggerReveal>
+    <div className="max-w-4xl mx-auto space-y-8">
+      {/* Header */}
+      <div className="text-center space-y-4">
+        <h1 className="font-display text-3xl font-semibold text-text-primary">
+          Sign in to RISS
+        </h1>
+        <p className="text-sm text-text-muted">
+          Connect a wallet or identity.
+        </p>
       </div>
+
+      {/* Role selection */}
+      <div className="flex justify-center gap-3">
+        <Button
+          variant={userType === 'developer' ? 'primary' : 'ghost'}
+          size="sm"
+          onClick={() => {
+            setUserType('developer')
+            setRoleHint(undefined)
+          }}
+        >
+          Builder / Developer
+        </Button>
+        <Button
+          variant={userType === 'organization' ? 'primary' : 'ghost'}
+          size="sm"
+          onClick={() => {
+            setUserType('organization')
+            setRoleHint(undefined)
+          }}
+        >
+          Organization / Client
+        </Button>
+      </div>
+      {roleHint && (
+        <p className="text-[11px] text-error text-center mt-1">{roleHint}</p>
+      )}
+
+      {/* Auth Methods Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {authMethods.map((method) => {
+          const Icon = method.icon
+          return (
+            <Card
+              key={method.id}
+              variant="glass"
+              hover
+              className="text-center cursor-pointer"
+              onClick={method.onClick}
+            >
+              <div className={`w-16 h-16 ${method.bgColor} rounded-full flex items-center justify-center mx-auto mb-4`}>
+                <Icon className={`w-8 h-8 ${method.color}`} />
+              </div>
+              <h3 className="font-display text-xl font-bold text-text-primary mb-2">
+                {method.title}
+              </h3>
+              <p className="text-sm text-text-muted">{method.description}</p>
+            </Card>
+          )
+        })}
+      </div>
+
+      {/* Wallet Connect Modal */}
+      <Modal
+        isOpen={showWalletModal}
+        onClose={() => setShowWalletModal(false)}
+        title="Connect Wallet"
+        size="md"
+      >
+        <div className="space-y-4">
+          <p className="text-text-muted text-sm">
+            Select a wallet to connect.
+          </p>
+          <div className="space-y-2">
+            {wallets.map((wallet) => (
+              <button
+                key={wallet.name}
+                className="w-full flex items-center justify-between p-4 bg-bg-secondary rounded-card hover:bg-bg-panel transition-colors"
+                onClick={async () => {
+                  if (!userType) {
+                    setRoleHint('Pick a role first.')
+                    return
+                  }
+                  if (wallet.type === 'evm') {
+                    await connectEvm()
+                  } else {
+                    await connectSolana()
+                  }
+                  setShowWalletModal(false)
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{wallet.icon}</span>
+                  <span className="font-medium text-text-primary">{wallet.name}</span>
+                </div>
+                <ArrowRight className="w-5 h-5 text-text-muted" />
+              </button>
+            ))}
+          </div>
+        </div>
+      </Modal>
+
+      {/* Username Modal - first time after wallet connect */}
+      <Modal
+        isOpen={showUsernameModal}
+        // Do not allow closing without picking a username to keep the flow simple
+        onClose={() => undefined}
+        title="Choose a username"
+        size="sm"
+      >
+        <div className="space-y-4">
+          <p className="text-text-muted text-sm">
+            Pick a handle for your RISS profile. You can change this later in Settings.
+          </p>
+          <Input
+            label="Username"
+            placeholder="e.g. gilly.dev"
+            value={usernameInput}
+            onChange={(e) => setUsernameInput(e.target.value)}
+          />
+          {usernameError && (
+            <p className="text-[11px] text-error">{usernameError}</p>
+          )}
+          <Button
+            variant="primary"
+            className="w-full"
+            disabled={savingUsername || !usernameInput.trim()}
+            onClick={async () => {
+              if (!walletAddress) return
+              const trimmed = usernameInput.trim()
+              if (!trimmed) return
+              setSavingUsername(true)
+              setUsernameError(undefined)
+              try {
+                const res = await fetch(`/api/user/${encodeURIComponent(walletAddress)}`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ username: trimmed }),
+                })
+                if (!res.ok) {
+                  let message = 'Failed to save username'
+                  try {
+                    const data = await res.json()
+                    if (data?.error) message = data.error
+                  } catch {
+                    // ignore json parse errors
+                  }
+                  setUsernameError(message)
+                  return
+                }
+                setShowUsernameModal(false)
+                setSavingUsername(false)
+                const role = pendingRedirectRole || userType || 'developer'
+                navigate(role === 'developer' ? '/dashboard' : '/explore')
+              } catch (error) {
+                console.error('Failed to save username', error)
+                setUsernameError('Failed to save username')
+              } finally {
+                setSavingUsername(false)
+              }
+            }}
+          >
+            {savingUsername ? 'Saving…' : 'Continue'}
+          </Button>
+        </div>
+      </Modal>
+
+      {/* Internet Identity Modal */}
+      <Modal
+        isOpen={showInternetIdentityModal}
+        onClose={() => setShowInternetIdentityModal(false)}
+        title="Internet Identity"
+        size="md"
+      >
+        <div className="space-y-4">
+          <p className="text-text-muted">
+            Sign in with your Internet Computer Identity
+          </p>
+          <Input
+            label="Identity Principal"
+            placeholder="Enter your principal ID"
+          />
+          <Button
+            variant="primary"
+            className="w-full"
+            onClick={() => {
+              console.log('Internet Identity login')
+              setShowInternetIdentityModal(false)
+            }}
+          >
+            Sign In
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+        </div>
+      </Modal>
     </div>
   )
 }
-

@@ -13,6 +13,37 @@ const taskSchema = z.object({
   scoreWeight: z.number().min(0).max(100),
 });
 
+interface ReputationScore {
+  total: number;
+  identity: number;
+  contribution: number;
+  trust: number;
+  social: number;
+  engagement: number;
+}
+
+function applyKrnlTaskToReputation(
+  current: ReputationScore,
+  scoreImpact: number,
+): ReputationScore {
+  const MAX = 100;
+  const clamp = (value: number) => Math.max(0, Math.min(MAX, value));
+  const next: ReputationScore = { ...current };
+
+  // KRNL tasks contribute to the contribution bucket, same as in the contract
+  next.contribution = clamp(next.contribution + scoreImpact);
+
+  next.total = Math.round(
+    next.identity * 0.25 +
+      next.contribution * 0.35 +
+      next.trust * 0.2 +
+      next.social * 0.1 +
+      next.engagement * 0.1,
+  );
+
+  return next;
+}
+
 /**
  * POST /api/krnl/task/complete
  * Process a completed KRNL task
@@ -56,6 +87,20 @@ router.post('/task/complete', async (req, res) => {
     });
 
     await activity.save();
+
+    // Update cached reputation score for the user
+    const baseScore: ReputationScore =
+      (user.reputationScore as ReputationScore) || {
+        total: 0,
+        identity: 0,
+        contribution: 0,
+        trust: 0,
+        social: 0,
+        engagement: 0,
+      };
+
+    user.reputationScore = applyKrnlTaskToReputation(baseScore, body.scoreWeight);
+    await user.save();
 
     // Process on blockchain
     const txHash = await processKrnlTaskOnChain(body.taskId);
@@ -117,6 +162,20 @@ router.post('/tasks/batch', async (req, res) => {
         });
 
         await activity.save();
+
+        const baseScore: ReputationScore =
+          (user.reputationScore as ReputationScore) || {
+            total: 0,
+            identity: 0,
+            contribution: 0,
+            trust: 0,
+            social: 0,
+            engagement: 0,
+          };
+
+        user.reputationScore = applyKrnlTaskToReputation(baseScore, validated.scoreWeight);
+        await user.save();
+
         results.push({ taskId: validated.taskId, status: 'processed' });
       } catch (error) {
         results.push({ taskId: task.taskId, status: 'error', error: error instanceof Error ? error.message : 'Unknown error' });

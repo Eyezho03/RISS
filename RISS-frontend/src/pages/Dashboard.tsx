@@ -1,218 +1,301 @@
-import { useState } from 'react'
-import { useAppContext } from '@/context/AppContext'
-import { StaggerReveal } from '@/components/ui/StaggerReveal'
+import {
+  User, Shield, Award, TrendingUp,
+  CheckCircle, Clock, XCircle, ExternalLink,
+} from 'lucide-react'
+import { Card } from '@/components/ui/Card'
+import { Progress } from '@/components/ui/Progress'
 import { Button } from '@/components/ui/Button'
-import { ReputationScore } from '@/components/ReputationScore'
-import { ActivityFeed } from '@/components/ActivityFeed'
-import { Shield, Share2, Copy, Check, QrCode, TrendingUp, Award, Users } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useKrnl } from '@/krnl/KrnlContext'
+import { TrustGraph } from '@/components/TrustGraph'
+import { ScoringPipeline } from '@/components/ScoringPipeline'
 
-export default function Dashboard(): JSX.Element {
-  const { wallet, did, reputation } = useAppContext()
-  const [shareUrl, setShareUrl] = useState('')
-  const [copied, setCopied] = useState(false)
+export default function Dashboard() {
+  const { state, loading } = useKrnl()
 
-  const handleShareProfile = async (): Promise<void> => {
-    const url = `${window.location.origin}/profile/${did.did || 'anonymous'}`
-    setShareUrl(url)
-    await navigator.clipboard.writeText(url)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+  const fallbackState = {
+    profile: {
+      did: 'did:riss:0x1234...5678',
+      wallets: ['0x1234...5678'],
+      identityStrength: 85,
+      badges: ['Verified Identity', 'KRNL Contributor', 'Trust Builder'],
+    },
+    reputation: {
+      score: 78,
+      identity: 25,
+      contribution: 28,
+      trust: 15,
+      social: 7,
+      engagement: 3,
+    },
+    tasks: [],
   }
 
-  const badges = [
-    { id: '1', name: 'Identity Verified', icon: Shield, earned: true },
-    { id: '2', name: 'First Contribution', icon: Award, earned: reputation.activities.length > 0 },
-    { id: '3', name: 'Trust Builder', icon: TrendingUp, earned: reputation.score.trust > 20 },
+  const effectiveState = state ?? fallbackState
+
+  const reputationScore = effectiveState.reputation.score
+  const identityStrength = effectiveState.profile.identityStrength
+
+  const reputationBreakdown = [
+    { label: 'Identity', value: effectiveState.reputation.identity, max: 25, color: 'purple' as const },
+    { label: 'Contribution', value: effectiveState.reputation.contribution, max: 35, color: 'cyan' as const },
+    { label: 'Trust', value: effectiveState.reputation.trust, max: 20, color: 'success' as const },
+    { label: 'Social', value: effectiveState.reputation.social, max: 10, color: 'warning' as const },
+    { label: 'Engagement', value: effectiveState.reputation.engagement, max: 10, color: 'purple' as const },
   ]
 
+  const badges = effectiveState.profile.badges.map((name) => ({
+    name,
+    icon: name === 'Verified Identity' ? Shield : name === 'KRNL Contributor' ? Award : TrendingUp,
+    color:
+      name === 'Verified Identity'
+        ? 'text-primary-purple'
+        : name === 'KRNL Contributor'
+        ? 'text-primary-cyan'
+        : 'text-success',
+  }))
+
+  const activities = [
+    {
+      id: '1',
+      type: 'KRNL Task',
+      title: 'Completed Smart Contract Audit',
+      source: 'KRNL Protocol',
+      timestamp: '2 hours ago',
+      status: 'verified',
+      score: '+15',
+    },
+    {
+      id: '2',
+      type: 'Verification',
+      title: 'Identity Verification Approved',
+      source: 'RISS Verifier',
+      timestamp: '1 day ago',
+      status: 'verified',
+      score: '+10',
+    },
+    {
+      id: '3',
+      type: 'Contribution',
+      title: 'GitHub PR Merged',
+      source: 'github.com',
+      timestamp: '3 days ago',
+      status: 'verified',
+      score: '+8',
+    },
+    {
+      id: '4',
+      type: 'Verification',
+      title: 'Skill Verification Pending',
+      source: 'RISS Verifier',
+      timestamp: '5 days ago',
+      status: 'pending',
+      score: 'Pending',
+    },
+  ]
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'verified':
+        return <CheckCircle className="w-5 h-5 text-success" />
+      case 'pending':
+        return <Clock className="w-5 h-5 text-warning" />
+      case 'rejected':
+        return <XCircle className="w-5 h-5 text-error" />
+      default:
+        return null
+    }
+  }
+
   return (
-    <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-8 pb-24 md:pb-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <StaggerReveal>
-          {/* Profile Header */}
-          <div className="bg-panel border-2 border-accent p-6 sm:p-8">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div className="flex-1">
-                <div className="flex items-center space-x-4 mb-4">
-                  <div className="w-16 h-16 bg-accent/20 border-2 border-accent flex items-center justify-center">
-                    <span className="font-display text-2xl font-bold text-accent">
-                      {wallet.address?.slice(2, 4).toUpperCase() || 'R'}
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="font-display text-3xl font-semibold text-text-primary mb-1">
+            Dashboard
+          </h1>
+          <p className="text-sm text-text-muted">
+            Score, identity, activity.
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Link to="/verification">
+            <Button variant="primary">
+              Start Verification
+            </Button>
+          </Link>
+          <Link to="/reputation">
+            <Button variant="ghost" size="sm">
+              View AI score breakdown
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* Main Grid - 12 columns */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Column - Profile & Stats */}
+        <div className="lg:col-span-4 space-y-6">
+          {/* DID Profile Card */}
+          <Card variant="glass">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary-purple to-primary-cyan rounded-full flex items-center justify-center">
+                <User className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h3 className="font-display text-xl font-bold text-text-primary">
+                  {state?.profile.did ?? 'did:riss:loading...'}
+                </h3>
+                <p className="text-sm text-text-muted">
+                  Identity Strength: {identityStrength}%
+                </p>
+              </div>
+            </div>
+            <Progress
+              value={identityStrength}
+              variant="linear"
+              color="purple"
+              size="md"
+            />
+          </Card>
+
+          {/* Reputation Score Card */}
+          <Card variant="glass">
+            <div className="text-center mb-6">
+              <div className="text-5xl font-display font-bold text-primary-cyan mb-2">
+                {loading ? '—' : reputationScore}
+              </div>
+              <div className="text-text-muted">Reputation Score</div>
+            </div>
+            <Progress
+              value={reputationScore}
+              variant="radial"
+              size="lg"
+              color="cyan"
+            />
+          </Card>
+
+          {/* Badges */}
+          <Card variant="glass">
+            <h3 className="font-display text-lg font-bold text-text-primary mb-4">
+              Badges
+            </h3>
+            <div className="space-y-3">
+              {loading && badges.length === 0 && (
+                <p className="text-sm text-text-muted">Loading badges...</p>
+              )}
+              {badges.map((badge) => (
+                <div
+                  key={badge.name}
+                  className="flex items-center gap-3 p-3 bg-bg-secondary rounded-button"
+                >
+                  <badge.icon className={`w-5 h-5 ${badge.color}`} />
+                  <span className="text-sm text-text-primary">{badge.name}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+
+        {/* Right Column - Breakdown, Scoring Engine, Trust Graph & Activity */}
+        <div className="lg:col-span-8 space-y-6">
+          {/* Reputation Breakdown */}
+          <Card variant="glass">
+            <h3 className="font-display text-xl font-bold text-text-primary mb-6">
+              Reputation Breakdown
+            </h3>
+            <div className="space-y-4">
+              {reputationBreakdown.map((item) => (
+                <div key={item.label}>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium text-text-primary">
+                      {item.label}
+                    </span>
+                    <span className="text-sm text-text-muted">
+                      {item.value} / {item.max}
                     </span>
                   </div>
-                  <div>
-                    <h1 className="font-display text-3xl font-bold text-accent">
-                      {wallet.ensName || wallet.address?.slice(0, 6) + '...' + wallet.address?.slice(-4) || 'Anonymous'}
-                    </h1>
-                    {did.did && (
-                      <p className="font-mono text-sm text-muted break-all">{did.did}</p>
-                    )}
-                  </div>
+                  <Progress
+                    value={(item.value / item.max) * 100}
+                    variant="linear"
+                    color={item.color}
+                    size="sm"
+                  />
                 </div>
-                {wallet.isConnected && wallet.address && (
-                  <p className="font-mono text-xs text-muted break-all">{wallet.address}</p>
-                )}
-              </div>
-              <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm" onClick={handleShareProfile}>
-                  <QrCode size={16} className="mr-2" />
-                  Share
-                </Button>
-                {copied && (
-                  <span className="font-body text-xs text-accent flex items-center">
-                    <Check size={14} className="mr-1" />
-                    Copied!
-                  </span>
-                )}
-              </div>
+              ))}
             </div>
-          </div>
+          </Card>
 
-          {/* RISS Score - Prominent */}
-          <div className="bg-panel border-2 border-muted/20 p-6 sm:p-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="font-display text-2xl font-bold text-accent">Reputation Score</h2>
-              <Link to="/reputation">
-                <Button variant="ghost" size="sm">
-                  View Breakdown
-                </Button>
-              </Link>
+          {/* Scoring Engine Overview */}
+          <Card variant="glass">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-display text-xl font-bold text-text-primary">
+                Scoring flow
+              </h3>
+              <span className="text-xs text-text-muted">From DID to on-chain proof</span>
             </div>
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-              <ReputationScore score={reputation.score} size="lg" />
-              <div className="flex-1 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-bg border-2 border-muted/20 p-4">
-                    <div className="font-body text-sm text-muted mb-1">Total Activities</div>
-                    <div className="font-display text-2xl font-bold text-accent">
-                      {reputation.activities.length}
-                    </div>
-                  </div>
-                  <div className="bg-bg border-2 border-muted/20 p-4">
-                    <div className="font-body text-sm text-muted mb-1">Verified</div>
-                    <div className="font-display text-2xl font-bold text-accent">
-                      {reputation.activities.filter((a) => a.verificationLevel === 'verified').length}
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-bg border-2 border-muted/20 p-4">
-                  <div className="font-body text-sm text-muted mb-2">Score Breakdown</div>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-body text-muted">Identity</span>
-                      <span className="font-display font-bold text-accent">
-                        {reputation.score.identity}/100
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-body text-muted">Contribution</span>
-                      <span className="font-display font-bold text-accent">
-                        {reputation.score.contribution}/100
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-body text-muted">Trust</span>
-                      <span className="font-display font-bold text-accent">
-                        {reputation.score.trust}/100
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+            <ScoringPipeline />
+          </Card>
 
-          {/* Badges Section */}
-          <div className="bg-panel border-2 border-muted/20 p-6">
-            <h3 className="font-display text-xl font-bold text-accent mb-4">Badges</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {badges.map((badge) => {
-                const Icon = badge.icon
-                return (
-                  <div
-                    key={badge.id}
-                    className={`bg-bg border-2 ${
-                      badge.earned ? 'border-accent' : 'border-muted/20'
-                    } p-4`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div
-                        className={`p-2 border-2 ${
-                          badge.earned ? 'border-accent bg-accent/20' : 'border-muted/20'
-                        }`}
-                      >
-                        <Icon
-                          size={20}
-                          className={badge.earned ? 'text-accent' : 'text-muted'}
-                        />
-                      </div>
-                      <div>
-                        <div
-                          className={`font-display font-bold ${
-                            badge.earned ? 'text-accent' : 'text-muted'
-                          }`}
-                        >
-                          {badge.name}
-                        </div>
-                        {badge.earned && (
-                          <div className="font-body text-xs text-muted">Earned</div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
+          {/* Trust Graph */}
+          <TrustGraph />
 
           {/* Activity Feed */}
-          <div className="bg-panel border-2 border-muted/20 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display text-xl font-bold text-accent">Activity Feed</h3>
+          <Card variant="glass">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-display text-xl font-bold text-text-primary">
+                Activity Feed
+              </h3>
               <Link to="/activity">
                 <Button variant="ghost" size="sm">
                   View All
+                  <ExternalLink className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </div>
-            <ActivityFeed
-              activities={reputation.activities.slice(0, 5)}
-              onActivityClick={(activity) => {
-                console.log('Activity clicked:', activity)
-              }}
-            />
-          </div>
-
-          {/* Quick Actions */}
-          <div className="bg-panel border-2 border-muted/20 p-6">
-            <h3 className="font-display text-xl font-bold text-accent mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Link to="/verify">
-                <Button variant="secondary" className="w-full">
-                  <Shield size={16} className="mr-2" />
-                  Verify Identity
-                </Button>
-              </Link>
-              <Link to="/tasks">
-                <Button variant="secondary" className="w-full">
-                  <Award size={16} className="mr-2" />
-                  View Tasks
-                </Button>
-              </Link>
-              <Link to="/explore">
-                <Button variant="secondary" className="w-full">
-                  <Users size={16} className="mr-2" />
-                  Explore
-                </Button>
-              </Link>
-              <Link to="/settings">
-                <Button variant="ghost" className="w-full">
-                  Settings
-                </Button>
-              </Link>
+            <div className="space-y-4">
+              {activities.map((activity) => (
+                <div
+                  key={activity.id}
+                  className="flex items-start gap-4 p-4 bg-bg-secondary rounded-button hover:bg-bg-panel transition-colors"
+                >
+                  <div className="mt-1">{getStatusIcon(activity.status)}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs font-medium text-primary-cyan uppercase">
+                            {activity.type}
+                          </span>
+                        </div>
+                        <h4 className="font-medium text-text-primary mb-1">
+                          {activity.title}
+                        </h4>
+                        <p className="text-sm text-text-muted">
+                          {activity.source} • {activity.timestamp}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <span
+                          className={`text-sm font-bold ${
+                            activity.status === 'verified'
+                              ? 'text-success'
+                              : activity.status === 'pending'
+                              ? 'text-warning'
+                              : 'text-error'
+                          }`}
+                        >
+                          {activity.score}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
-        </StaggerReveal>
+          </Card>
+        </div>
       </div>
     </div>
   )

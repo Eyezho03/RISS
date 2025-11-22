@@ -2,6 +2,7 @@ import express from 'express';
 import { User } from '../database/models/User.js';
 import { Activity } from '../database/models/Activity.js';
 import { getReputationScoreOnChain } from '../services/blockchain.js';
+import { createScoreProof } from '../services/proof.js';
 import { logger } from '../utils/logger.js';
 
 const router = express.Router();
@@ -32,6 +33,36 @@ router.get('/:address', async (req, res) => {
       trust: user?.reputationScore.trust || 0,
       social: user?.reputationScore.social || 0,
       engagement: user?.reputationScore.engagement || 0,
+      lastUpdated: user?.updatedAt ? Math.floor(user.updatedAt.getTime() / 1000) : 0,
+    };
+
+    const aiWeights = {
+      identity: 0.25,
+      contribution: 0.35,
+      trust: 0.2,
+      social: 0.1,
+      engagement: 0.1,
+    };
+
+    const engineVersion = 'riss-ai-v1';
+
+    const proofMeta = createScoreProof({
+      address,
+      did: user?.did,
+      score,
+      aiWeights,
+      engineVersion,
+    });
+
+    const proof = {
+      onChain: Boolean(onChainScore),
+      engineVersion,
+      lastUpdated:
+        onChainScore && onChainScore.lastUpdated
+          ? new Date(onChainScore.lastUpdated * 1000).toISOString()
+          : user?.updatedAt?.toISOString() ?? null,
+      ipfsCid: proofMeta.ipfsCid,
+      proofHash: proofMeta.proofHash,
     };
 
     res.json({
@@ -39,6 +70,8 @@ router.get('/:address', async (req, res) => {
       did: user?.did,
       score,
       verificationLevel: user?.verificationLevel || 'unverified',
+      aiWeights,
+      proof,
     });
   } catch (error) {
     logger.error('Error getting reputation:', error);
@@ -68,10 +101,19 @@ router.get('/:address/breakdown', async (req, res) => {
       .filter(a => a.verificationLevel === 'verified')
       .reduce((sum, a) => sum + a.scoreImpact, 0);
 
+    const aiWeights = {
+      identity: 0.25,
+      contribution: 0.35,
+      trust: 0.2,
+      social: 0.1,
+      engagement: 0.1,
+    };
+
     res.json({
       address,
       did: user.did,
       score: user.reputationScore,
+      aiWeights,
       stats: {
         totalActivities: activities.length,
         verifiedActivities: verifiedCount,

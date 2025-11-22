@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
-import type { ReputationScore, ActivityProof } from '@/types/reputation'
+import type { ReputationScore, ActivityProof, ActivityType } from '@/types/reputation'
 
 /**
  * useReputation Hook
  * Manages reputation scoring and activity proofs
- * Integrates with KRNL Protocol for task-based scoring
+ * Integrates with KRNL Protocol for task-based scoring and backend API.
  */
-export function useReputation() {
+export function useReputation(address?: string | null) {
   const [score, setScore] = useState<ReputationScore>({
     total: 0,
     identity: 0,
@@ -38,7 +38,6 @@ export function useReputation() {
           break
         case 'github_commit':
         case 'github_pr':
-        case 'github_issue':
         case 'krnl_task_completed':
         case 'bounty_completed':
           contribution += impact
@@ -77,16 +76,45 @@ export function useReputation() {
     return { total, identity, contribution, trust, social, engagement }
   }, [])
 
-  // Load activities and calculate score
+  // Load activities and score
   useEffect(() => {
     const loadReputation = async (): Promise<void> => {
       setIsLoading(true)
       try {
-        // Mock: Load from localStorage or API
-        const stored = localStorage.getItem('riss_activities')
+        if (address) {
+          // Primary path: load from backend API using wallet address
+          const res = await fetch(`/api/reputation/${encodeURIComponent(address)}/breakdown`)
+          if (res.ok) {
+            const data = await res.json()
+
+            const apiActivities: ActivityProof[] = (data.activities || []).map((a: any) => ({
+              id: a.id,
+              type: a.type as ActivityType,
+              title: a.title,
+              description: a.description ?? '',
+              source: a.source,
+              timestamp:
+                typeof a.timestamp === 'string'
+                  ? a.timestamp
+                  : new Date(a.timestamp).toISOString(),
+              verificationLevel: a.verificationLevel ?? 'pending',
+              scoreImpact: a.scoreImpact ?? 0,
+              metadata: a.metadata,
+            }))
+
+            setActivities(apiActivities)
+            // Use backend-computed score as the source of truth
+            setScore(data.score as ReputationScore)
+            return
+          }
+        }
+
+        // Fallback: local mock/storage when no address or API not available
+        const stored = typeof window !== 'undefined'
+          ? window.localStorage.getItem('riss_activities')
+          : null
         const loadedActivities: ActivityProof[] = stored ? JSON.parse(stored) : []
 
-        // Add some mock activities if empty
         if (loadedActivities.length === 0) {
           const mockActivities: ActivityProof[] = [
             {
@@ -101,15 +129,16 @@ export function useReputation() {
             },
           ]
           setActivities(mockActivities)
-          localStorage.setItem('riss_activities', JSON.stringify(mockActivities))
+          if (typeof window !== 'undefined') {
+            window.localStorage.setItem('riss_activities', JSON.stringify(mockActivities))
+          }
+          const calculatedScore = calculateScore(mockActivities)
+          setScore(calculatedScore)
         } else {
           setActivities(loadedActivities)
+          const calculatedScore = calculateScore(loadedActivities)
+          setScore(calculatedScore)
         }
-
-        const calculatedScore = calculateScore(
-          loadedActivities.length > 0 ? loadedActivities : []
-        )
-        setScore(calculatedScore)
       } catch (error) {
         console.error('Failed to load reputation:', error)
       } finally {
@@ -117,8 +146,8 @@ export function useReputation() {
       }
     }
 
-    loadReputation()
-  }, [calculateScore])
+    void loadReputation()
+  }, [address, calculateScore])
 
   // Add new activity proof
   const addActivity = useCallback(

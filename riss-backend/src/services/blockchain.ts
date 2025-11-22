@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import { ethers } from 'ethers';
 import { logger } from '../utils/logger.js';
 
@@ -124,6 +127,7 @@ export async function getReputationScoreOnChain(
   trust: number;
   social: number;
   engagement: number;
+  lastUpdated: number;
 } | null> {
   if (!rissReputationContract) {
     return null;
@@ -138,6 +142,7 @@ export async function getReputationScoreOnChain(
       trust: Number(score.trust),
       social: Number(score.social),
       engagement: Number(score.engagement),
+      lastUpdated: Number(score.lastUpdated),
     };
   } catch (error) {
     logger.error('Failed to get reputation score on-chain:', error);

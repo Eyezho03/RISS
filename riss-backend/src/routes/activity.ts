@@ -17,6 +17,49 @@ const activitySchema = z.object({
   metadata: z.record(z.unknown()).optional(),
 });
 
+interface ReputationScore {
+  total: number;
+  identity: number;
+  contribution: number;
+  trust: number;
+  social: number;
+  engagement: number;
+}
+
+function applyActivityToReputation(
+  current: ReputationScore,
+  activityType: string,
+  scoreImpact: number,
+): ReputationScore {
+  const MAX = 100;
+  const clamp = (value: number) => Math.max(0, Math.min(MAX, value));
+  const next: ReputationScore = { ...current };
+
+  if (['verification', 'certification'].includes(activityType)) {
+    next.identity = clamp(next.identity + scoreImpact);
+  } else if (
+    ['github_commit', 'github_pr', 'krnl_task_completed', 'bounty_completed'].includes(activityType)
+  ) {
+    next.contribution = clamp(next.contribution + scoreImpact);
+  } else if (['endorsement', 'dao_vote'].includes(activityType)) {
+    next.trust = clamp(next.trust + scoreImpact);
+  } else if (['github_issue', 'dao_proposal'].includes(activityType)) {
+    next.social = clamp(next.social + scoreImpact);
+  } else if (['course_completion', 'event_attendance'].includes(activityType)) {
+    next.engagement = clamp(next.engagement + scoreImpact);
+  }
+
+  next.total = Math.round(
+    next.identity * 0.25 +
+      next.contribution * 0.35 +
+      next.trust * 0.2 +
+      next.social * 0.1 +
+      next.engagement * 0.1,
+  );
+
+  return next;
+}
+
 /**
  * POST /api/activity
  * Submit a new activity proof
@@ -161,8 +204,23 @@ router.post('/:proofId/verify', async (req, res) => {
     activity.verifier = verifierAddress;
     await activity.save();
 
-    // Update user reputation score
-    // TODO: Calculate and update reputation score
+    // Update user reputation score (off-chain cache mirroring on-chain weights)
+    const baseScore: ReputationScore =
+      (user.reputationScore as ReputationScore) || {
+        total: 0,
+        identity: 0,
+        contribution: 0,
+        trust: 0,
+        social: 0,
+        engagement: 0,
+      };
+
+    user.reputationScore = applyActivityToReputation(
+      baseScore,
+      activity.activityType,
+      activity.scoreImpact,
+    );
+    await user.save();
 
     // Verify on blockchain
     const activities = await Activity.find({ userId: user._id }).sort({ timestamp: 1 });

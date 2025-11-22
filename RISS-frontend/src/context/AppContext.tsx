@@ -19,7 +19,7 @@ export function AppProvider({ children }: { children: ReactNode }): JSX.Element 
   const wallet = useWallet()
   const did = useDID()
   const theme = useTheme()
-  const reputation = useReputation()
+  const reputation = useReputation(wallet.address)
   const krnlTasks = useKrnlTasks()
 
   return (

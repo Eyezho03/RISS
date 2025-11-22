@@ -1,25 +1,44 @@
 import { ReactNode, useEffect } from 'react'
-import { useAppContext } from '@/context/AppContext'
-import Navbar from '@/components/Navbar'
-import MobileBottomBar from '@/components/MobileBottomBar'
+import { Navbar } from '@/components/Navbar'
+import { useAuth } from '@/auth/AuthContext'
 
 interface LayoutProps {
   children: ReactNode
 }
 
-export default function Layout({ children }: LayoutProps): JSX.Element {
-  const { theme } = useAppContext()
+export function Layout({ children }: LayoutProps) {
+  const { infoMessage, errorMessage, clearMessage } = useAuth()
 
+  // Auto-clear messages after a short delay
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme.theme)
-  }, [theme.theme])
+    if (!infoMessage && !errorMessage) return
+    const id = setTimeout(() => {
+      clearMessage()
+    }, 4000)
+    return () => clearTimeout(id)
+  }, [infoMessage, errorMessage, clearMessage])
+
+  const hasMessage = infoMessage || errorMessage
 
   return (
-    <div className="min-h-screen bg-bg text-muted">
+    <div className="min-h-screen bg-bg-primary">
       <Navbar />
-      <main className="relative z-10">{children}</main>
-      <MobileBottomBar />
+      {hasMessage && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2">
+          <div
+            className={`inline-flex items-center px-3 py-2 rounded-button text-xs border ${
+              errorMessage
+                ? 'bg-error/10 border-error/60 text-error'
+                : 'bg-success/10 border-success/60 text-success'
+            }`}
+          >
+            <span>{errorMessage || infoMessage}</span>
+          </div>
+        </div>
+      )}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {children}
+      </main>
     </div>
   )
 }
-

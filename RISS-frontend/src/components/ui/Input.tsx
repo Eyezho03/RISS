@@ -1,45 +1,38 @@
 import { InputHTMLAttributes, forwardRef } from 'react'
-import { cn } from '@/lib/utils'
+import { clsx } from 'clsx'
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string
   error?: string
+  helperText?: string
 }
 
-/**
- * Input Component
- * Minimal brutalist form input with big label typography
- */
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, id, ...props }, ref) => {
-    const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`
-
+  ({ label, error, helperText, className, ...props }, ref) => {
     return (
       <div className="w-full">
         {label && (
-          <label
-            htmlFor={inputId}
-            className="block font-display text-lg font-bold text-accent mb-2"
-          >
+          <label className="block text-sm font-medium text-text-primary mb-2">
             {label}
           </label>
         )}
         <input
           ref={ref}
-          id={inputId}
-          className={cn(
-            'w-full px-4 py-3 bg-panel border-2 border-muted/20 text-muted',
-            'font-body focus:outline-none focus:border-accent focus:text-accent',
-            'transition-colors duration-200',
-            error && 'border-red-500',
+          className={clsx(
+            'w-full px-4 py-3 bg-bg-panel border border-border rounded-button',
+            'text-text-primary placeholder:text-text-muted',
+            'focus:outline-none focus:ring-2 focus:ring-primary-purple focus:border-transparent',
+            'transition-all duration-200',
+            error && 'border-error focus:ring-error',
             className
           )}
           {...props}
         />
         {error && (
-          <p className="mt-1 text-sm text-red-500" role="alert">
-            {error}
-          </p>
+          <p className="mt-1 text-sm text-error">{error}</p>
+        )}
+        {helperText && !error && (
+          <p className="mt-1 text-sm text-text-muted">{helperText}</p>
         )}
       </div>
     )
@@ -47,4 +40,3 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 )
 
 Input.displayName = 'Input'
-

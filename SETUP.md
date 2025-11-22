@@ -15,8 +15,8 @@ Desktop/
 
 **Note**: The RISS folder is currently in use. To rename it to `riss-frontend`:
 
-1. Close all applications using the folder (Cursor, VS Code, terminal, etc.)
-2. Right-click the `RISS` folder → Rename → `riss-frontend`
+1. Close all applications using the folder (code editors, terminals, etc.)
+2. Right-click the `RISS` folder  Rename  `riss-frontend`
 3. Or use PowerShell (when folder is not in use):
    ```powershell
    cd C:\Users\gilly\Desktop

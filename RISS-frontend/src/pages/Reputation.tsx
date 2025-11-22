@@ -42,10 +42,10 @@ export default function Reputation(): JSX.Element {
           {/* Header */}
           <div>
             <h1 className="font-display text-4xl font-bold text-accent mb-2">
-              Reputation Breakdown
+              AI Reputation Breakdown
             </h1>
             <p className="font-body text-muted">
-              Transparent scoring system showing how your reputation is calculated
+              Transparent, AI-assisted scoring system showing exactly how your reputation is calculated.
             </p>
           </div>
 

@@ -6,7 +6,7 @@ Follow these steps to get your RISS platform up and running!
 
 The frontend folder is currently named `RISS`. When you're ready:
 
-1. **Close Cursor/VS Code** (the folder is in use)
+1. **Close your code editor** (make sure the folder is not in use)
 2. **Right-click** the `RISS` folder on your Desktop
 3. **Rename** it to `riss-frontend`
 
