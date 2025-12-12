@@ -1,32 +1,43 @@
-/**
- * RISS Design Tokens
- * Cyber-Noir theme with single accent color (#B6FF3B)
- * Typography: Expressive display + supporting serif/sans combos
- */
-
 export const DesignTokens = {
   colors: {
-    bg: '#0A0A0C',
-    panel: '#1E1E22',
-    accent: '#B6FF3B', // TOXIC GREEN — single accent
-    muted: '#9AA0A6',
-    glass: 'rgba(255,255,255,0.02)',
-    // Light mode variants
+    // Dark mode - black palette
+    bg: '#000000',
+    secondary: '#111111',
+    panel: '#1A1A1A',
+    accent: '#B8860B',
+    accentStrong: '#9C7209',
+    accentSoft: 'rgba(184, 134, 11, 0.12)',
+    text: '#FFFFFF',
+    muted: '#CCCCCC',
+    textOnAccent: '#000000',
+    border: 'rgba(255, 255, 255, 0.15)',
+    borderStrong: 'rgba(184, 134, 11, 0.4)',
+    overlay: 'rgba(0, 0, 0, 0.7)',
+    glass: 'rgba(255, 255, 255, 0.03)',
+    // Light mode - white palette
     light: {
-      bg: '#FAFAFA',
-      panel: '#FFFFFF',
-      accent: '#B6FF3B',
-      muted: '#6B7280',
-      glass: 'rgba(0,0,0,0.02)',
+      bg: '#FFFFFF',
+      secondary: '#F5F5F5',
+      panel: '#FAFAFA',
+      accent: '#B8860B',
+      accentStrong: '#A37409',
+      accentSoft: 'rgba(184, 134, 11, 0.12)',
+      text: '#000000',
+      muted: '#666666',
+      textOnAccent: '#FFFFFF',
+      border: 'rgba(0, 0, 0, 0.15)',
+      borderStrong: 'rgba(184, 134, 11, 0.45)',
+      overlay: 'rgba(255, 255, 255, 0.7)',
+      glass: 'rgba(0, 0, 0, 0.02)',
     },
   },
   typography: {
     display: {
-      fontFamily: 'Clash Display, "Canela", serif',
+      fontFamily: 'Inter, "Segoe UI", system-ui, sans-serif',
       fontWeight: 700,
     },
     body: {
-      fontFamily: '"Neue Haas Grotesk Text", "Merriweather Sans", sans-serif',
+      fontFamily: 'Inter, "Segoe UI", system-ui, sans-serif',
       fontWeight: 400,
     },
   },
@@ -45,16 +56,20 @@ export const DesignTokens = {
   },
 } as const;
 
-/**
- * CSS Variables for design tokens
- * These are injected into :root via index.css
- */
 export const cssVariables = `
   :root {
-    --bg: ${DesignTokens.colors.bg};
-    --panel: ${DesignTokens.colors.panel};
+    --bg-primary: ${DesignTokens.colors.bg};
+    --bg-secondary: ${DesignTokens.colors.secondary};
+    --bg-panel: ${DesignTokens.colors.panel};
     --accent: ${DesignTokens.colors.accent};
-    --muted: ${DesignTokens.colors.muted};
+    --accent-strong: ${DesignTokens.colors.accentStrong};
+    --accent-soft: ${DesignTokens.colors.accentSoft};
+    --text-primary: ${DesignTokens.colors.text};
+    --text-muted: ${DesignTokens.colors.muted};
+    --text-on-accent: ${DesignTokens.colors.textOnAccent};
+    --border: ${DesignTokens.colors.border};
+    --border-strong: ${DesignTokens.colors.borderStrong};
+    --overlay: ${DesignTokens.colors.overlay};
     --glass: ${DesignTokens.colors.glass};
     
     --spacing-xs: ${DesignTokens.spacing.xs};
@@ -69,10 +84,18 @@ export const cssVariables = `
   }
   
   :root[data-theme="light"] {
-    --bg: ${DesignTokens.colors.light.bg};
-    --panel: ${DesignTokens.colors.light.panel};
+    --bg-primary: ${DesignTokens.colors.light.bg};
+    --bg-secondary: ${DesignTokens.colors.light.secondary};
+    --bg-panel: ${DesignTokens.colors.light.panel};
     --accent: ${DesignTokens.colors.light.accent};
-    --muted: ${DesignTokens.colors.light.muted};
+    --accent-strong: ${DesignTokens.colors.light.accentStrong};
+    --accent-soft: ${DesignTokens.colors.light.accentSoft};
+    --text-primary: ${DesignTokens.colors.light.text};
+    --text-muted: ${DesignTokens.colors.light.muted};
+    --text-on-accent: ${DesignTokens.colors.light.textOnAccent};
+    --border: ${DesignTokens.colors.light.border};
+    --border-strong: ${DesignTokens.colors.light.borderStrong};
+    --overlay: ${DesignTokens.colors.light.overlay};
     --glass: ${DesignTokens.colors.light.glass};
   }
 `;

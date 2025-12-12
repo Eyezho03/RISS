@@ -21,7 +21,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           className={clsx(
             'w-full px-4 py-3 bg-bg-panel border border-border rounded-button',
             'text-text-primary placeholder:text-text-muted',
-            'focus:outline-none focus:ring-2 focus:ring-primary-purple focus:border-transparent',
+            'focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent',
             'transition-all duration-200',
             error && 'border-error focus:ring-error',
             className

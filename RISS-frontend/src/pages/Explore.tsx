@@ -114,7 +114,7 @@ export default function Explore() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-2xl font-bold text-text-primary flex items-center gap-2">
-              <TrendingUp className="w-6 h-6 text-primary-cyan" />
+              <TrendingUp className="w-6 h-6 text-accent" />
               Top Contributors
             </h2>
           </div>
@@ -130,7 +130,7 @@ export default function Explore() {
                       {user.badges.map((badge) => (
                         <span
                           key={badge}
-                          className="text-xs px-2 py-1 bg-primary-purple/20 text-primary-purple rounded-button"
+                          className="text-xs px-2 py-1 bg-accent-soft text-accent rounded-button"
                         >
                           {badge}
                         </span>
@@ -140,11 +140,11 @@ export default function Explore() {
                   <div>
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-sm text-text-muted">Reputation</span>
-                      <span className="text-sm font-bold text-primary-cyan">
+                      <span className="text-sm font-bold text-accent">
                         {user.reputation}
                       </span>
                     </div>
-                    <Progress value={user.reputation} variant="linear" color="cyan" size="sm" />
+                    <Progress value={user.reputation} variant="linear" color="accent" size="sm" />
                   </div>
                   <div className="flex items-center justify-between text-sm text-text-muted">
                     <span>{user.activities} activities</span>
@@ -168,7 +168,7 @@ export default function Explore() {
       {(filter === 'all' || filter === 'daos') && (
         <div className="space-y-4">
           <h2 className="font-display text-2xl font-bold text-text-primary flex items-center gap-2">
-            <Building2 className="w-6 h-6 text-primary-purple" />
+            <Building2 className="w-6 h-6 text-accent" />
             Top DAOs
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -184,11 +184,11 @@ export default function Explore() {
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-text-muted">Reputation Score</span>
-                      <span className="text-sm font-bold text-primary-purple">
+                      <span className="text-sm font-bold text-accent">
                         {dao.reputation}
                       </span>
                     </div>
-                    <Progress value={dao.reputation} variant="linear" color="purple" size="sm" />
+                    <Progress value={dao.reputation} variant="linear" color="accent" size="sm" />
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-text-muted">

@@ -20,10 +20,10 @@ export function Button({
   const baseStyles = 'font-display font-semibold transition-all duration-200 rounded-button disabled:opacity-50 disabled:cursor-not-allowed'
   
   const variants = {
-    primary: 'bg-primary-purple text-white hover:bg-purple-600 hover:shadow-neon-purple active:scale-95',
-    secondary: 'bg-primary-cyan text-white hover:bg-cyan-500 hover:shadow-neon-cyan active:scale-95',
-    ghost: 'bg-transparent border border-border text-text-primary hover:bg-bg-panel hover:border-primary-purple',
-    danger: 'bg-error text-white hover:bg-red-600 active:scale-95',
+    primary: 'bg-accent text-text-on-accent hover:bg-accent-strong active:scale-95',
+    secondary: 'bg-bg-secondary border border-border text-text-primary hover:bg-bg-panel active:scale-95',
+    ghost: 'bg-transparent border border-border text-text-primary hover:bg-bg-panel hover:border-accent',
+    danger: 'bg-error text-white hover:opacity-90 active:scale-95',
   }
   
   const sizes = {

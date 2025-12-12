@@ -19,10 +19,10 @@ export function Card({
   const variants = {
     default: 'bg-bg-panel border border-border',
     glass: 'glass-panel',
-    bordered: 'bg-bg-secondary border-2 border-primary-purple/30',
+    bordered: 'bg-bg-secondary border-2 border-accent/30',
   }
   
-  const hoverStyles = hover ? 'hover:border-primary-purple/50 hover:shadow-neon-purple cursor-pointer' : ''
+  const hoverStyles = hover ? 'hover:border-accent/50 cursor-pointer' : ''
   
   return (
     <div

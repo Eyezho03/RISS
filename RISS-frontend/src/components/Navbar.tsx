@@ -1,14 +1,16 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Wallet, Menu, X } from 'lucide-react'
+import { Wallet, Menu, X, Sun, Moon } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from './ui/Button'
 import { clsx } from 'clsx'
 import { useAuth } from '@/auth/AuthContext'
+import { useTheme } from '@/hooks/useTheme'
 
 export function Navbar() {
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { walletAddress, walletType, userType, connectEvm } = useAuth()
+  const { walletAddress, userType, connectEvm } = useAuth()
+  const { theme, toggleTheme } = useTheme()
 
   const navLinks = [
     { path: '/', label: 'Home' },
@@ -31,8 +33,8 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary-purple to-primary-cyan rounded-button flex items-center justify-center">
-              <span className="text-white font-display font-bold text-sm">R</span>
+            <div className="w-8 h-8 bg-accent rounded-button flex items-center justify-center">
+              <span className="text-text-on-accent font-display font-bold text-sm">R</span>
             </div>
             <span className="font-display font-bold text-xl text-text-primary">
               RISS
@@ -48,7 +50,7 @@ export function Navbar() {
                 className={clsx(
                   'text-sm font-medium transition-colors duration-200',
                   isActive(link.path)
-                    ? 'text-primary-purple'
+                    ? 'text-accent'
                     : 'text-text-muted hover:text-text-primary'
                 )}
               >
@@ -64,6 +66,17 @@ export function Navbar() {
                 {userType === 'developer' ? 'Dev' : 'Org'}
               </span>
             )}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-button border border-border hover:bg-bg-panel transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-4 h-4 text-text-primary" />
+              ) : (
+                <Moon className="w-4 h-4 text-text-primary" />
+              )}
+            </button>
             <Button
               variant={walletAddress ? 'secondary' : 'primary'}
               size="sm"
@@ -98,13 +111,30 @@ export function Navbar() {
                   className={clsx(
                     'text-sm font-medium px-2 py-1',
                     isActive(link.path)
-                      ? 'text-primary-purple'
+                      ? 'text-accent'
                       : 'text-text-muted'
                   )}
                 >
                   {link.label}
                 </Link>
               ))}
+              <button
+                onClick={toggleTheme}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium border border-border rounded-button hover:bg-bg-panel transition-colors"
+                aria-label="Toggle theme"
+              >
+                {theme === 'dark' ? (
+                  <>
+                    <Sun className="w-4 h-4" />
+                    Light Mode
+                  </>
+                ) : (
+                  <>
+                    <Moon className="w-4 h-4" />
+                    Dark Mode
+                  </>
+                )}
+              </button>
               <Button
                 variant={walletAddress ? 'secondary' : 'primary'}
                 size="sm"

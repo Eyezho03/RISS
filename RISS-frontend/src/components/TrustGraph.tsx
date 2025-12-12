@@ -20,8 +20,7 @@ interface TrustGraphProps {
 
 /**
  * Simple radial trust graph visualization using SVG.
- * This is a placeholder for a more advanced graph, but matches
- * the neon / Web3 aesthetic using your existing color tokens.
+ * Minimalist design using the accent color palette.
  */
 export function TrustGraph({ nodes, edges }: TrustGraphProps) {
   const { computedNodes, computedEdges } = useMemo(() => {
@@ -77,14 +76,7 @@ export function TrustGraph({ nodes, edges }: TrustGraphProps) {
       </div>
       <div className="flex items-center justify-center">
         <svg width={size} height={size}>
-          <defs>
-            <radialGradient id="trust-bg" cx="50%" cy="50%" r="70%">
-              <stop offset="0%" stopColor="rgba(56,189,248,0.1)" />
-              <stop offset="100%" stopColor="rgba(15,23,42,0)" />
-            </radialGradient>
-          </defs>
-
-          <circle cx={center} cy={center} r={center - 10} fill="url(#trust-bg)" />
+          <circle cx={center} cy={center} r={center - 10} fill="var(--accent-soft)" />
 
           {computedEdges.map((edge, idx) => {
             const from = findNode(edge.from)
@@ -98,7 +90,7 @@ export function TrustGraph({ nodes, edges }: TrustGraphProps) {
                 y1={from.y}
                 x2={to.x}
                 y2={to.y}
-                stroke="rgba(56,189,248,1)"
+                stroke="var(--accent)"
                 strokeWidth={1.5}
                 strokeOpacity={opacity}
               />
@@ -113,8 +105,8 @@ export function TrustGraph({ nodes, edges }: TrustGraphProps) {
                   cx={node.x}
                   cy={node.y}
                   r={isCenter ? 12 : 8}
-                  fill={isCenter ? 'rgba(168,85,247,1)' : 'rgba(15,23,42,1)'}
-                  stroke={isCenter ? 'rgba(56,189,248,1)' : 'rgba(148,163,184,0.6)'}
+                  fill={isCenter ? 'var(--accent)' : 'var(--bg-panel)'}
+                  stroke={isCenter ? 'var(--accent)' : 'var(--border)'}
                   strokeWidth={2}
                 />
                 <text

@@ -1,6 +1,7 @@
 import { ReactNode, useEffect } from 'react'
 import { Navbar } from '@/components/Navbar'
 import { useAuth } from '@/auth/AuthContext'
+import { useTheme } from '@/hooks/useTheme'
 
 interface LayoutProps {
   children: ReactNode
@@ -8,6 +9,8 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const { infoMessage, errorMessage, clearMessage } = useAuth()
+  // Initialize theme on app load
+  useTheme()
 
   // Auto-clear messages after a short delay
   useEffect(() => {

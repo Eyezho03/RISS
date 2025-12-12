@@ -36,7 +36,7 @@ export default function Tasks() {
           </p>
         </div>
         <div className="hidden md:flex items-center gap-2 text-sm text-text-muted">
-          <KanbanSquare className="w-5 h-5 text-primary-cyan" />
+          <KanbanSquare className="w-5 h-5 text-accent" />
           <span>Kanban view</span>
         </div>
       </div>
@@ -62,7 +62,7 @@ export default function Tasks() {
               {column.tasks.map((task) => (
                 <div
                   key={task.id}
-                  className="p-3 bg-bg-secondary rounded-card border border-border hover:border-primary-purple/40 hover:bg-bg-panel transition-colors"
+                  className="p-3 bg-bg-secondary rounded-card border border-border hover:border-accent/40 hover:bg-bg-panel transition-colors"
                 >
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div>
@@ -73,7 +73,7 @@ export default function Tasks() {
                         {task.description}
                       </p>
                     </div>
-                    <span className="text-xs px-2 py-1 bg-primary-cyan/10 text-primary-cyan rounded-button whitespace-nowrap">
+                    <span className="text-xs px-2 py-1 bg-accent-soft text-accent rounded-button whitespace-nowrap">
                       {task.points} pts
                     </span>
                   </div>

@@ -5,7 +5,7 @@ interface ProgressProps {
   max?: number
   variant?: 'linear' | 'radial'
   size?: 'sm' | 'md' | 'lg'
-  color?: 'purple' | 'cyan' | 'success' | 'warning' | 'error'
+  color?: 'accent' | 'success' | 'warning' | 'error'
   label?: string
   showValue?: boolean
 }
@@ -15,15 +15,14 @@ export function Progress({
   max = 100,
   variant = 'linear',
   size = 'md',
-  color = 'purple',
+  color = 'accent',
   label,
   showValue = true,
 }: ProgressProps) {
   const percentage = Math.min(Math.max((value / max) * 100, 0), 100)
 
   const colors = {
-    purple: 'bg-primary-purple',
-    cyan: 'bg-primary-cyan',
+    accent: 'bg-accent',
     success: 'bg-success',
     warning: 'bg-warning',
     error: 'bg-error',

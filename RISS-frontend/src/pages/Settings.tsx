@@ -39,7 +39,7 @@ export default function Settings() {
       {/* Wallet Management */}
       <Card variant="glass">
         <div className="flex items-center gap-3 mb-6">
-          <Wallet className="w-6 h-6 text-primary-purple" />
+          <Wallet className="w-6 h-6 text-accent" />
           <h2 className="font-display text-2xl font-bold text-text-primary">
             Wallet Management
           </h2>
@@ -80,7 +80,7 @@ export default function Settings() {
       {/* Privacy Settings */}
       <Card variant="glass">
         <div className="flex items-center gap-3 mb-6">
-          <Lock className="w-6 h-6 text-primary-cyan" />
+          <Lock className="w-6 h-6 text-accent" />
           <h2 className="font-display text-2xl font-bold text-text-primary">
             Privacy Settings
           </h2>
@@ -134,7 +134,7 @@ export default function Settings() {
       {/* Notifications */}
       <Card variant="glass">
         <div className="flex items-center gap-3 mb-6">
-          <Bell className="w-6 h-6 text-primary-purple" />
+          <Bell className="w-6 h-6 text-accent" />
           <h2 className="font-display text-2xl font-bold text-text-primary">
             Notifications
           </h2>

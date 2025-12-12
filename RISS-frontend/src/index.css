@@ -7,24 +7,21 @@
 
 @layer base {
   :root {
-    /* Colors - Futuristic Web3 Theme */
-    --bg-primary: #0A0F1F;
-    --bg-secondary: #111827;
-    --bg-panel: #1F2937;
-    
-    --primary-purple: #A855F7;
-    --primary-cyan: #38BDF8;
-    
+    /* Dark mode - black palette */
+    --bg-primary: #000000;
+    --bg-secondary: #111111;
+    --bg-panel: #1A1A1A;
+    --accent: #B8860B;
+    --accent-strong: #9C7209;
+    --accent-soft: rgba(184, 134, 11, 0.12);
     --text-primary: #FFFFFF;
-    --text-muted: #9CA3AF;
-    
-    --success: #10B981;
-    --warning: #FACC15;
-    --error: #EF4444;
-    
-    --border: rgba(255, 255, 255, 0.1);
-    --glass: rgba(255, 255, 255, 0.05);
-    
+    --text-muted: #CCCCCC;
+    --text-on-accent: #000000;
+    --border: rgba(255, 255, 255, 0.15);
+    --border-strong: rgba(184, 134, 11, 0.4);
+    --overlay: rgba(0, 0, 0, 0.7);
+    --glass: rgba(255, 255, 255, 0.03);
+
     /* Spacing */
     --spacing-xs: 0.5rem;
     --spacing-sm: 1rem;
@@ -32,24 +29,42 @@
     --spacing-lg: 2rem;
     --spacing-xl: 3rem;
     --spacing-2xl: 4rem;
-    
+
     /* Typography */
     --font-display: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
-  
+
+  :root[data-theme="light"] {
+    /* Light mode - white palette */
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F5F5F5;
+    --bg-panel: #FAFAFA;
+    --accent: #B8860B;
+    --accent-strong: #A37409;
+    --accent-soft: rgba(184, 134, 11, 0.12);
+    --text-primary: #000000;
+    --text-muted: #666666;
+    --text-on-accent: #FFFFFF;
+    --border: rgba(0, 0, 0, 0.15);
+    --border-strong: rgba(184, 134, 11, 0.45);
+    --overlay: rgba(255, 255, 255, 0.7);
+    --glass: rgba(0, 0, 0, 0.02);
+  }
+
   * {
     border-color: var(--border);
   }
-  
+
   body {
-    /* Using CSS variables directly instead of Tailwind utilities to avoid missing class errors */
     font-family: var(--font-body);
     background-color: var(--bg-primary);
     color: var(--text-primary);
     min-height: 100vh;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     font-weight: 700;
@@ -60,69 +75,26 @@
   .text-balance {
     text-wrap: balance;
   }
-  
+
   .font-display {
     font-family: var(--font-display);
   }
-  
+
   .font-body {
     font-family: var(--font-body);
   }
-  
+
   .glass-panel {
-    background: rgba(31, 41, 55, 0.6);
-    backdrop-filter: blur(10px);
+    background: var(--bg-panel);
     border: 1px solid var(--border);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+    backdrop-filter: blur(6px);
   }
-  
+
   .grid-12 {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: 1.5rem;
-  }
-
-  /* Landing hero crypto grid + animated orb */
-  .landing-hero-grid {
-    position: absolute;
-    inset: -2rem;
-    background-image:
-      linear-gradient(to right, rgba(148, 163, 184, 0.12) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
-    background-size: 40px 40px;
-    opacity: 0.6;
-    pointer-events: none;
-    mask-image: radial-gradient(circle at top left, black, transparent 65%);
-  }
-
-  .landing-orb {
-    position: absolute;
-    right: -8rem;
-    top: -8rem;
-    width: 24rem;
-    height: 24rem;
-    background:
-      radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.35), transparent 60%),
-      radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.45), transparent 60%);
-    filter: blur(2px);
-    opacity: 0.8;
-    transform-origin: center;
-    animation: landing-orb-spin 22s linear infinite alternate;
-    pointer-events: none;
-  }
-
-  @keyframes landing-orb-spin {
-    0% {
-      transform: translate3d(0, 0, 0) scale(1);
-      opacity: 0.7;
-    }
-    50% {
-      transform: translate3d(-10px, 10px, 0) scale(1.05);
-      opacity: 0.9;
-    }
-    100% {
-      transform: translate3d(10px, -10px, 0) scale(1.1);
-      opacity: 0.75;
-    }
   }
 
   .floating-badge {
@@ -135,6 +107,41 @@
     }
     50% {
       transform: translateY(-6px);
+    }
+  }
+
+  .skeleton-wave {
+    background: linear-gradient(
+      90deg,
+      var(--bg-panel) 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      var(--bg-panel) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-wave 1.5s ease-in-out infinite;
+  }
+
+  @keyframes skeleton-wave {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 0.3s ease-out;
+  }
+
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
     }
   }
 }

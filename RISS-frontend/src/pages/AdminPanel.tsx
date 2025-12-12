@@ -108,7 +108,7 @@ export default function AdminPanel() {
       <Card variant="glass">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <h2 className="font-display text-2xl font-bold text-text-primary flex items-center gap-2">
-            <Users className="w-6 h-6 text-primary-purple" />
+            <Users className="w-6 h-6 text-accent" />
             Verification Requests
           </h2>
           <div className="flex gap-2">
@@ -162,7 +162,7 @@ export default function AdminPanel() {
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-1">
                     <span className="font-medium text-text-primary">{request.user}</span>
-                    <span className="text-xs px-2 py-1 bg-primary-cyan/20 text-primary-cyan rounded-button">
+                    <span className="text-xs px-2 py-1 bg-accent-soft text-accent rounded-button">
                       {request.type}
                     </span>
                   </div>

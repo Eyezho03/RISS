@@ -70,8 +70,8 @@ export default function Auth() {
       title: 'Connect Wallet',
       description: 'Connect with MetaMask, WalletConnect, or other Web3 wallets',
       icon: Wallet,
-      color: 'text-primary-purple',
-      bgColor: 'bg-primary-purple/20',
+      color: 'text-accent',
+      bgColor: 'bg-accent-soft',
       onClick: () => setShowWalletModal(true),
     },
     {
@@ -79,8 +79,8 @@ export default function Auth() {
       title: 'Internet Identity',
       description: 'Sign in with Internet Computer Identity',
       icon: Globe,
-      color: 'text-primary-cyan',
-      bgColor: 'bg-primary-cyan/20',
+      color: 'text-accent',
+      bgColor: 'bg-accent-soft',
       onClick: () => setShowInternetIdentityModal(true),
     },
     {
@@ -95,8 +95,8 @@ export default function Auth() {
   ]
 
   const wallets = [
-    { name: 'MetaMask (EVM)', icon: '🦊', type: 'evm' as const },
-    { name: 'Phantom (Solana)', icon: '👻', type: 'solana' as const },
+    { name: 'MetaMask (EVM)', icon: null, type: 'evm' as const },
+    { name: 'Phantom (Solana)', icon: null, type: 'solana' as const },
   ]
 
   return (
@@ -192,7 +192,7 @@ export default function Auth() {
                 }}
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">{wallet.icon}</span>
+                  {wallet.icon && <span className="text-2xl">{wallet.icon}</span>}
                   <span className="font-medium text-text-primary">{wallet.name}</span>
                 </div>
                 <ArrowRight className="w-5 h-5 text-text-muted" />

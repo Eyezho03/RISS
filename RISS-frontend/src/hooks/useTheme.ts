@@ -14,7 +14,7 @@ export function useTheme() {
     if (stored && (stored === 'dark' || stored === 'light')) {
       return stored
     }
-    // Default to dark (Cyber-Noir)
+    // Default to dark
     return 'dark'
   })
 

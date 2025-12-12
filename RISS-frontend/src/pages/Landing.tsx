@@ -99,15 +99,15 @@ export default function Landing() {
   return (
     <div className="relative space-y-20">
       {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-card border border-border bg-gradient-to-b from-bg-secondary/70 to-bg-panel/90 px-4 py-16 md:py-24">
+      <section className="relative overflow-hidden rounded-card border border-border bg-bg-panel px-4 py-16 md:py-24">
         <div className="landing-hero-grid" />
         <div className="landing-orb" />
         <StaggerReveal>
           <div className="relative z-10 grid gap-10 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1.2fr)] items-center">
             {/* Left column: narrative + primary CTAs */}
             <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/40 border border-primary-cyan/40 text-[11px] uppercase tracking-[0.2em] text-text-muted mb-2 floating-badge">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary-cyan" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-bg-secondary border border-accent/40 text-[11px] uppercase tracking-[0.2em] text-text-muted mb-2 floating-badge">
+                <span className="w-1.5 h-1.5 rounded-full bg-accent" />
                 <span>On-chain dev reputation</span>
               </div>
               <div className="space-y-3">
@@ -148,7 +148,7 @@ export default function Landing() {
 
               <div className="flex flex-wrap items-center gap-3 text-[11px] text-text-muted mt-6">
                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border bg-bg-panel/60">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary-purple" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
                   EVM chains
                 </span>
                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border bg-bg-panel/40">
@@ -162,8 +162,8 @@ export default function Landing() {
 
             {/* Right column: live score card */}
             <div className="flex justify-center">
-              <Card variant="glass" className="relative w-full max-w-md border border-primary-cyan/30 bg-gradient-to-br from-bg-panel/80 via-bg-secondary/90 to-black/90">
-                <div className="absolute inset-0 rounded-card border border-primary-cyan/10 pointer-events-none" />
+              <Card variant="glass" className="relative w-full max-w-md border border-accent/30 bg-bg-panel">
+                <div className="absolute inset-0 rounded-card border border-accent/10 pointer-events-none" />
                 <div className="relative space-y-6">
                   <div className="flex items-center justify-between gap-3">
                     <div>
@@ -187,7 +187,7 @@ export default function Landing() {
                       <div className="text-xs uppercase tracking-[0.25em] text-text-muted mb-1">
                         RISS score
                       </div>
-                      <div className="font-display text-5xl font-bold text-primary-cyan">
+                      <div className="font-display text-5xl font-bold text-accent">
                         {isConnected && address ? score.total : '--'}
                       </div>
                       <div className="mt-2 text-[11px] text-text-muted max-w-[16rem]">
@@ -201,25 +201,25 @@ export default function Landing() {
                     <div className="flex flex-col gap-2 text-[11px] min-w-[7rem]">
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-text-muted">Identity</span>
-                        <span className="font-mono text-primary-cyan">
+                        <span className="font-mono text-accent">
                           {score.identity}
                         </span>
                       </div>
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-text-muted">Contribution</span>
-                        <span className="font-mono text-primary-cyan">
+                        <span className="font-mono text-accent">
                           {score.contribution}
                         </span>
                       </div>
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-text-muted">Trust</span>
-                        <span className="font-mono text-primary-cyan">
+                        <span className="font-mono text-accent">
                           {score.trust}
                         </span>
                       </div>
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-text-muted">Social</span>
-                        <span className="font-mono text-primary-cyan">
+                        <span className="font-mono text-accent">
                           {score.social}
                         </span>
                       </div>
@@ -230,13 +230,13 @@ export default function Landing() {
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
                         <span>Next milestone</span>
-                        <span className="font-mono text-primary-cyan">
+                        <span className="font-mono text-accent">
                           {isConnected && address ? `${Math.min(100, score.total + 5)}+` : '—'}
                         </span>
                       </div>
                       <div className="h-1.5 w-full rounded-full bg-bg-secondary overflow-hidden">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-primary-purple to-primary-cyan transition-all duration-500"
+                          className="h-full rounded-full bg-accent transition-all duration-500"
                           style={{ width: `${Math.min(100, score.total)}%` }}
                         />
                       </div>
@@ -257,7 +257,7 @@ export default function Landing() {
       <section className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {statsDisplayData.map((stat) => (
           <Card key={stat.label} variant="glass" className="text-center">
-            <div className="text-3xl font-display font-bold text-primary-cyan mb-2">
+            <div className="text-3xl font-display font-bold text-accent mb-2">
               {stat.value}
             </div>
             <div className="text-sm text-text-muted">{stat.label}</div>
@@ -278,7 +278,7 @@ export default function Landing() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature) => (
             <Card key={feature.title} variant="glass" hover>
-              <feature.icon className="w-10 h-10 text-primary-purple mb-4" />
+              <feature.icon className="w-10 h-10 text-accent mb-4" />
               <h3 className="font-display text-xl font-bold text-text-primary mb-2">
                 {feature.title}
               </h3>
@@ -290,7 +290,7 @@ export default function Landing() {
 
       {/* CTA Section */}
       <section className="relative overflow-hidden rounded-card">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary-purple/20 to-primary-cyan/20" />
+        <div className="absolute inset-0 bg-accent-soft" />
         <Card variant="bordered" className="relative text-center space-y-4 py-10">
           <h2 className="font-display text-2xl font-semibold text-text-primary">
             Get your RISS score

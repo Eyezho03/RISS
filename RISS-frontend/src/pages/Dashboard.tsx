@@ -37,11 +37,11 @@ export default function Dashboard() {
   const identityStrength = effectiveState.profile.identityStrength
 
   const reputationBreakdown = [
-    { label: 'Identity', value: effectiveState.reputation.identity, max: 25, color: 'purple' as const },
-    { label: 'Contribution', value: effectiveState.reputation.contribution, max: 35, color: 'cyan' as const },
+    { label: 'Identity', value: effectiveState.reputation.identity, max: 25, color: 'accent' as const },
+    { label: 'Contribution', value: effectiveState.reputation.contribution, max: 35, color: 'accent' as const },
     { label: 'Trust', value: effectiveState.reputation.trust, max: 20, color: 'success' as const },
     { label: 'Social', value: effectiveState.reputation.social, max: 10, color: 'warning' as const },
-    { label: 'Engagement', value: effectiveState.reputation.engagement, max: 10, color: 'purple' as const },
+    { label: 'Engagement', value: effectiveState.reputation.engagement, max: 10, color: 'accent' as const },
   ]
 
   const badges = effectiveState.profile.badges.map((name) => ({
@@ -49,9 +49,9 @@ export default function Dashboard() {
     icon: name === 'Verified Identity' ? Shield : name === 'KRNL Contributor' ? Award : TrendingUp,
     color:
       name === 'Verified Identity'
-        ? 'text-primary-purple'
+        ? 'text-accent'
         : name === 'KRNL Contributor'
-        ? 'text-primary-cyan'
+        ? 'text-accent'
         : 'text-success',
   }))
 
@@ -140,8 +140,8 @@ export default function Dashboard() {
           {/* DID Profile Card */}
           <Card variant="glass">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary-purple to-primary-cyan rounded-full flex items-center justify-center">
-                <User className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center">
+                <User className="w-8 h-8 text-text-on-accent" />
               </div>
               <div>
                 <h3 className="font-display text-xl font-bold text-text-primary">
@@ -155,7 +155,7 @@ export default function Dashboard() {
             <Progress
               value={identityStrength}
               variant="linear"
-              color="purple"
+              color="accent"
               size="md"
             />
           </Card>
@@ -163,7 +163,7 @@ export default function Dashboard() {
           {/* Reputation Score Card */}
           <Card variant="glass">
             <div className="text-center mb-6">
-              <div className="text-5xl font-display font-bold text-primary-cyan mb-2">
+              <div className="text-5xl font-display font-bold text-accent mb-2">
                 {loading ? '—' : reputationScore}
               </div>
               <div className="text-text-muted">Reputation Score</div>
@@ -172,7 +172,7 @@ export default function Dashboard() {
               value={reputationScore}
               variant="radial"
               size="lg"
-              color="cyan"
+              color="accent"
             />
           </Card>
 
@@ -265,7 +265,7 @@ export default function Dashboard() {
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs font-medium text-primary-cyan uppercase">
+                          <span className="text-xs font-medium text-accent uppercase">
                             {activity.type}
                           </span>
                         </div>

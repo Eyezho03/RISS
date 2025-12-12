@@ -23,7 +23,7 @@ export function ScoringPipeline() {
             <div key={step.label} className="flex items-center gap-2">
               <div className="flex flex-col items-center gap-2">
                 <div className="w-9 h-9 rounded-full bg-bg-panel border border-border flex items-center justify-center">
-                  <Icon className="w-4 h-4 text-primary-cyan" />
+                  <Icon className="w-4 h-4 text-accent" />
                 </div>
                 <span className="text-[11px] text-text-muted text-center max-w-[80px]">
                   {step.label}

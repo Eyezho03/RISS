@@ -72,7 +72,7 @@ export default function VerificationFlow() {
       {/* Progress Steps */}
       <Card variant="glass">
         <div className="mb-6">
-          <Progress value={getStepProgress()} variant="linear" color="purple" />
+          <Progress value={getStepProgress()} variant="linear" color="accent" />
         </div>
         <div className="flex justify-between">
           {steps.map((step, index) => {
@@ -83,7 +83,7 @@ export default function VerificationFlow() {
                 <div
                   className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
                     isActive
-                      ? 'bg-primary-purple text-white'
+                      ? 'bg-accent text-text-on-accent'
                       : 'bg-bg-panel text-text-muted'
                   }`}
                 >
@@ -117,8 +117,8 @@ export default function VerificationFlow() {
                     onClick={() => setVerificationType(type.id)}
                     className={`p-4 rounded-card border-2 transition-all text-left ${
                       verificationType === type.id
-                        ? 'border-primary-purple bg-primary-purple/10'
-                        : 'border-border bg-bg-secondary hover:border-primary-purple/50'
+                        ? 'border-accent bg-accent-soft'
+                        : 'border-border bg-bg-secondary hover:border-accent/50'
                     }`}
                   >
                     <h3 className="font-medium text-text-primary mb-1">{type.label}</h3>
@@ -135,7 +135,7 @@ export default function VerificationFlow() {
                 to build a transparent, verifiable score that DAOs and clients can trust.
               </p>
               <label className="block">
-                <div className="border-2 border-dashed border-border rounded-card p-12 text-center hover:border-primary-purple transition-colors cursor-pointer">
+                <div className="border-2 border-dashed border-border rounded-card p-12 text-center hover:border-accent transition-colors cursor-pointer">
                   <Upload className="w-12 h-12 text-text-muted mx-auto mb-4" />
                   <p className="text-text-primary mb-2">
                     Click to upload or drag and drop
