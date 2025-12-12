@@ -29,10 +29,10 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 z-40 glass-panel border-b border-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
+      <div className="w-full">
+        <div className="flex items-center justify-between h-16 pl-4 pr-4 sm:pl-6 sm:pr-6">
+          {/* Logo - Far Left */}
+          <Link to="/" className="flex items-center gap-2 flex-shrink-0">
             <div className="w-8 h-8 bg-accent rounded-button flex items-center justify-center">
               <span className="text-text-on-accent font-display font-bold text-sm">R</span>
             </div>
@@ -41,8 +41,9 @@ export function Navbar() {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          {/* Desktop Navigation & Wallet - Far Right */}
+          <div className="hidden md:flex items-center gap-8 flex-shrink-0">
+            {/* Navigation Links */}
             {navLinks.map((link) => (
               <Link
                 key={link.path}
@@ -57,36 +58,36 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
-          </div>
 
-          {/* Wallet Connect & Actions */}
-          <div className="hidden md:flex items-center gap-4">
-            {userType && (
-              <span className="text-[11px] px-2 py-1 rounded-button border border-border text-text-muted">
-                {userType === 'developer' ? 'Dev' : 'Org'}
-              </span>
-            )}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-button border border-border hover:bg-bg-panel transition-colors"
-              aria-label="Toggle theme"
-            >
-              {theme === 'dark' ? (
-                <Sun className="w-4 h-4 text-text-primary" />
-              ) : (
-                <Moon className="w-4 h-4 text-text-primary" />
+            {/* Wallet Connect & Actions */}
+            <div className="flex items-center gap-4 ml-4">
+              {userType && (
+                <span className="text-[11px] px-2 py-1 rounded-button border border-border text-text-muted">
+                  {userType === 'developer' ? 'Dev' : 'Org'}
+                </span>
               )}
-            </button>
-            <Button
-              variant={walletAddress ? 'secondary' : 'primary'}
-              size="sm"
-              onClick={handleWalletConnect}
-            >
-              <Wallet className="w-4 h-4 mr-2" />
-              {walletAddress
-                ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
-                : 'Connect Wallet'}
-            </Button>
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-button border border-border hover:bg-bg-panel transition-colors"
+                aria-label="Toggle theme"
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-4 h-4 text-text-primary" />
+                ) : (
+                  <Moon className="w-4 h-4 text-text-primary" />
+                )}
+              </button>
+              <Button
+                variant={walletAddress ? 'secondary' : 'primary'}
+                size="sm"
+                onClick={handleWalletConnect}
+              >
+                <Wallet className="w-4 h-4 mr-2" />
+                {walletAddress
+                  ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+                  : 'Connect Wallet'}
+              </Button>
+            </div>
           </div>
 
           {/* Mobile Menu Button */}

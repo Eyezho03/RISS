@@ -27,7 +27,7 @@ export function Layout({ children }: LayoutProps) {
     <div className="min-h-screen bg-bg-primary">
       <Navbar />
       {hasMessage && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2">
+        <div className="w-full px-4 sm:px-6 lg:px-8 pt-2">
           <div
             className={`inline-flex items-center px-3 py-2 rounded-button text-xs border ${
               errorMessage
@@ -39,7 +39,7 @@ export function Layout({ children }: LayoutProps) {
           </div>
         </div>
       )}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="w-full px-4 sm:px-6 lg:px-8 py-8">
         {children}
       </main>
     </div>
